@@ -53,23 +53,29 @@ export default function ChatContainer() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const handleSend = (content: string) => {
-    if (!content.trim()) return;
-    addMessage('user', content);
+  const handleSend = async (content: string) => {
+  if (!content.trim()) return;
 
-    // Simulate bot response
-    setTimeout(() => {
-      const responses = [
-        "That's an interesting point. Here's my take...",
-        "I see what you mean. Let me expand on that.",
-        "Great question! Here's what I know about it.",
-        "Absolutely. Here's a detailed response.",
-        "Thanks for asking. This is what I think...",
-      ];
-      const randomReply = responses[Math.floor(Math.random() * responses.length)];
-      addMessage('bot', randomReply);
-    }, 650);
-  };
+  // add user message
+  addMessage('user', content);
+
+  try {
+    const res = await fetch('http://127.0.0.1:8000/api/chat', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ question: content }),
+    });
+
+    const data = await res.json();
+
+    // add bot response from FastAPI
+    addMessage('bot', data.answer);
+  } catch (error) {
+    addMessage('bot', 'Sorry, something went wrong connecting to the server.');
+  }
+};
 
   if (!isLoaded) {
     return (
