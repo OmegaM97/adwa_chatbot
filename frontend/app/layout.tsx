@@ -15,7 +15,7 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'ChatBot',
+  title: 'AAU ChatBot',
   description: 'A clean, production-ready interface built with Next.js',
   icons: {
     icon: '/favicon.ico',

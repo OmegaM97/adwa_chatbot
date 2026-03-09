@@ -57,7 +57,7 @@ export default function ChatInput({ onSend }: ChatInputProps) {
           value={value}
           onChange={(e) => setValue(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder="Message ChatBot..."
+          placeholder="Message AAU ChatBot..."
           rows={1}
           className="flex-1 bg-transparent px-5 py-3.5 text-[15.5px] placeholder-zinc-400 focus:outline-none resize-none leading-tight max-h-[192px] overflow-hidden scrollbar-thin"
         />
@@ -85,7 +85,7 @@ export default function ChatInput({ onSend }: ChatInputProps) {
       </div>
 
       <div className="text-center text-[10px] text-zinc-500 mt-3 tracking-widest">
-        ChatBot may make mistakes • Demo UI
+        AAU ChatBot may make mistakes • Check Important Info
       </div>
     </div>
   );
