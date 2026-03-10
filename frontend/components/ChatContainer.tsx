@@ -1,81 +1,64 @@
 'use client';
-
 import { useRef, useEffect, useState } from 'react';
-import { useLocalStorageChat } from '@/hooks/useLocalStorageChats'; 
+import { useLocalStorageChat } from '@/hooks/useLocalStorageChats';
 import ChatMessage from './ChatMessage';
 import ChatInput from './ChatInput';
-import { Bot } from 'lucide-react';
+import { Bot, Loader2 } from 'lucide-react';
 
 export default function ChatContainer() {
   const { messages, addMessage, clearMessages, isLoaded } = useLocalStorageChat();
   const scrollRef = useRef<HTMLDivElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [loading, setLoading] = useState(false);
+
   const hasMessages = messages.length > 0;
 
-  // Scroll to bottom function
   const scrollToBottom = (behavior: ScrollBehavior = 'auto') => {
     if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ 
-        behavior, 
-        block: 'end' 
-      });
+      messagesEndRef.current.scrollIntoView({ behavior, block: 'end' });
     }
   };
 
-  // Scroll on initial load
   useEffect(() => {
     if (isLoaded && hasMessages) {
-      // Use setTimeout to ensure DOM is ready
-      setTimeout(() => {
-        scrollToBottom('auto');
-      }, 0);
+      setTimeout(() => scrollToBottom('auto'), 0);
     }
   }, [isLoaded, hasMessages]);
 
-  // Scroll when messages change (new message added)
   useEffect(() => {
     if (hasMessages) {
-      // Small delay to ensure DOM is updated with new message
-      setTimeout(() => {
-        scrollToBottom('smooth');
-      }, 50);
+      setTimeout(() => scrollToBottom('smooth'), 50);
     }
   }, [messages.length, hasMessages]);
 
-  // Detect scroll for sticky header shadow/blur effect
   useEffect(() => {
-    const handleScroll = () => {
-      if (window.scrollY > 10) setIsScrolled(true);
-      else setIsScrolled(false);
-    };
+    const handleScroll = () => setIsScrolled(window.scrollY > 10);
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   const handleSend = async (content: string) => {
-  if (!content.trim()) return;
+    if (!content.trim()) return;
 
-  // add user message
-  addMessage('user', content);
+    addMessage('user', content);
+    setLoading(true);
 
-  try {
-    const res = await fetch('http://127.0.0.1:8000/api/chat', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ question: content }),
-    });
+    try {
+      const res = await fetch('http://127.0.0.1:8000/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ question: content }),
+      });
 
-    const data = await res.json();
-
-    // add bot response from FastAPI
-    addMessage('bot', data.answer);
-  } catch (error) {
-    addMessage('bot', 'Sorry, something went wrong connecting to the server.');
-  }
-};
+      const data = await res.json();
+      addMessage('bot', data.answer);
+    } catch (error) {
+      addMessage('bot', 'Sorry, something went wrong connecting to the server.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   if (!isLoaded) {
     return (
@@ -91,18 +74,15 @@ export default function ChatContainer() {
 
   return (
     <div className="relative z-10 min-h-screen flex flex-col">
-      {/* Fixed Navbar */}
+      {/* Navbar */}
       <header
         className={`
-          fixed top-0 inset-x-0 z-50 
-          h-14 flex items-center justify-between 
-          px-6 md:px-10 lg:px-12 
-          border-b border-white/10 
+          fixed top-0 inset-x-0 z-50 h-14 flex items-center justify-between
+          px-6 md:px-10 lg:px-12 border-b border-white/10
           transition-all duration-300
-          ${isScrolled 
-            ? 'bg-black/80 backdrop-blur-xl shadow-[0_4px_30px_rgba(0,0,0,0.4)]' 
-            : 'bg-black/40 backdrop-blur-sm'
-          }
+          ${isScrolled
+            ? 'bg-black/80 backdrop-blur-xl shadow-[0_4px_30px_rgba(0,0,0,0.4)]'
+            : 'bg-black/40 backdrop-blur-sm'}
         `}
       >
         <div className="flex items-center gap-3">
@@ -126,27 +106,40 @@ export default function ChatContainer() {
       <div
         ref={scrollRef}
         className={`
-          flex-1 overflow-y-auto
-          w-full max-w-5xl mx-auto
-          px-4 sm:px-6 lg:px-8
-          pt-20 pb-32 md:pb-40
-          scrollbar-thin space-y-8
-          mb-10
+          flex-1 overflow-y-auto w-full max-w-5xl mx-auto
+          px-4 sm:px-6 lg:px-8 pt-20 pb-32 md:pb-40
+          scrollbar-thin space-y-8 mb-10
           ${!hasMessages ? 'flex items-center justify-center' : ''}
         `}
       >
         {hasMessages ? (
           <>
-            {messages.map((msg) => (
-              <ChatMessage key={msg.id} message={msg} />
-            ))}
+            {messages.map((msg, index) => {
+              const isLast = index === messages.length - 1;
+              return (
+                <ChatMessage
+                  key={msg.id}
+                  message={msg}
+                  // ─── Only type the newest bot message AFTER it has arrived ───
+                  shouldType={msg.role === 'bot' && isLast && !loading}
+                />
+              );
+            })}
+
+            {/* Show spinner while waiting for server response */}
+            {loading && (
+              <div className="flex justify-start">
+                <div className="max-w-[78%] px-5 py-4 text-zinc-200 font-mono flex items-center gap-2 shadow-sm">
+                  <Loader2 className="w-5 h-5 animate-spin" strokeWidth={2} />
+                </div>
+              </div>
+            )}
           </>
         ) : (
           <div className="text-center max-w-md mx-auto mt-16 px-4">
             <div className="mx-auto mb-8 w-16 h-16 bg-zinc-900/80 backdrop-blur-xl border border-zinc-800 rounded-2xl flex items-center justify-center shadow-lg">
               <Bot className="w-8 h-8 text-zinc-200" strokeWidth={1.6} />
             </div>
-
             <h1 className="text-4xl md:text-5xl font-sans font-bold tracking-tighter mb-4 bg-gradient-to-b from-white to-zinc-400 bg-clip-text text-transparent">
               How can I help you?
             </h1>
@@ -157,15 +150,14 @@ export default function ChatContainer() {
         )}
       </div>
 
-      {/* Fixed Input */}
+      {/* Input area */}
       <div className="fixed bottom-0 left-0 right-0 z-40">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-10 pb-4 pt-2">
           <ChatInput onSend={handleSend} />
         </div>
       </div>
 
-      {/* Invisible div to scroll to */}
-            <div ref={messagesEndRef} />
+      <div ref={messagesEndRef} />
     </div>
   );
 }
