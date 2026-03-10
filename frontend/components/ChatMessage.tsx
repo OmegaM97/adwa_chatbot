@@ -38,7 +38,7 @@ export default function ChatMessage({ message, shouldType = false }: ChatMessage
         clearInterval(interval);
         setIsTypingFinished(true);
       }
-    }, 12); // slightly slower → ~80 chars/sec, more natural
+    }, 5); // slightly slower → ~80 chars/sec, more natural
 
     return () => clearInterval(interval);
   }, [message.content, isUser, shouldType]);
