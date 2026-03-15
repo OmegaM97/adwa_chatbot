@@ -89,7 +89,7 @@ export default function ChatContainer() {
           <div className="w-7 h-7 rounded-xl flex items-center justify-center text-xs font-bold">
             <Bot className="w-8 h-8 text-zinc-200" strokeWidth={1.6} />
           </div>
-          <span className="font-semibold tracking-tighter text-lg">AAU ChatBot</span>
+          <span className="font-semibold tracking-tighter text-lg">Adwa ChatBot</span>
         </div>
 
         {hasMessages && (
@@ -144,7 +144,7 @@ export default function ChatContainer() {
               How can I help you?
             </h1>
             <p className="text-zinc-400 font-mono text-base md:text-lg">
-              Ask me anything about AAU and I'll do my best to assist you.
+              Ask me anything about Adwa and I'll do my best to assist you.
             </p>
           </div>
         )}
