@@ -7,10 +7,11 @@ router = APIRouter()
 class Question(BaseModel):
     question: str
 
-
 @router.post("/chat")
 def chat(q: Question):
-
-    answer = ask_question(q.question)
-
-    return {"answer": answer}
+    """
+    Returns:
+    - {"text": "..."} for normal questions
+    - {"text": "...", "image": "<cloudinary_url>"} if AI wants image
+    """
+    return ask_question(q.question)
