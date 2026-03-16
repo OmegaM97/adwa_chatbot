@@ -45,6 +45,7 @@
 ```bash
 cd backend
 pipenv install
+```
 
 Note: Inside rag and other folders, some .py files are commented out. Remove comment markers to enable them.
 
@@ -52,20 +53,26 @@ Update any frontend URLs in backend config files to point to your local frontend
 
 Run the FastAPI server:
 
+```bash
 pipenv run uvicorn app:app --reload
+```
 
 The backend will now be available at http://127.0.0.1:8000
 
 ### 2️⃣ Frontend Setup
 
+```bash
 cd frontend
 npm install
+```
 
 Update any backend URLs in frontend code to point to your local FastAPI (http://127.0.0.1:8000).
 
 Run the Next.js frontend:
 
+```bash
 npm run dev
+```
 
 The frontend will be available at http://localhost:3000
 
@@ -94,5 +101,5 @@ The frontend will be available at http://localhost:3000
 ---
 
 - The RAG system ensures that responses are grounded in the collected Adwa data.
-- Keep `.env` variables updated for API keys (Gemini, etc.).
+- Keep `.env` variables updated for API keys (Gemini).
 - Use the command-line style history feature to recall previous questions.
