@@ -8,7 +8,7 @@ export default function BackgroundEffects() {
           backgroundImage: `url("/adwa_background_image.png")`,
         }}
       />
-      <div className="absolute inset-0 bg-black/60" />
+      <div className="absolute inset-0 bg-black/40" />
 
       <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
 

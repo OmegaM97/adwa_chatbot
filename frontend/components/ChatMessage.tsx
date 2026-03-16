@@ -1,57 +1,81 @@
 'use client';
 
 import { useEffect, useState } from "react";
+import parse from "html-react-parser";
 import type { Message } from '@/types/chat';
+import { Copy, Check } from "lucide-react";
 
 interface ChatMessageProps {
   message: Message;
   shouldType?: boolean;
 }
 
-export default function ChatMessage({ message, shouldType = false }: ChatMessageProps) {
+export default function ChatMessage({
+  message,
+  shouldType = false
+}: ChatMessageProps) {
   const isUser = message.role === 'user';
 
-  const [displayedText, setDisplayedText] = useState(
-    // Past messages + user messages → full content immediately
-    isUser || !shouldType ? message.content : ''
+  const [typedLength, setTypedLength] = useState(
+    isUser || !shouldType ? message.content.length : 0
   );
 
-  const [isTypingFinished, setIsTypingFinished] = useState(isUser || !shouldType);
+  const [isFinished, setIsFinished] = useState(
+    isUser || !shouldType
+  );
+
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     if (isUser || !shouldType) {
-      setDisplayedText(message.content);
-      setIsTypingFinished(true);
+      setTypedLength(message.content.length);
+      setIsFinished(true);
       return;
     }
 
-    // Reset + start typing for new bot messages
-    setDisplayedText('');
-    setIsTypingFinished(false);
+    setTypedLength(0);
+    setIsFinished(false);
 
     let index = 0;
+
     const interval = setInterval(() => {
-      if (index < message.content.length) {
-        setDisplayedText((prev) => prev + message.content[index]);
-        index++;
+      index++;
+
+      if (index <= message.content.length) {
+        setTypedLength(index);
       } else {
         clearInterval(interval);
-        setIsTypingFinished(true);
+        setIsFinished(true);
       }
-    }, 5); // slightly slower → ~80 chars/sec, more natural
+    }, 8);
 
     return () => clearInterval(interval);
   }, [message.content, isUser, shouldType]);
 
-  // What we show right now
-  const content = isTypingFinished ? message.content : displayedText;
+  const visibleHTML = message.content.slice(0, typedLength);
+
+  // 🔹 Copy handler
+  const handleCopy = async () => {
+    try {
+      // Strip HTML → copy clean text
+      const temp = document.createElement("div");
+      temp.innerHTML = message.content;
+      const text = temp.textContent || temp.innerText || "";
+
+      await navigator.clipboard.writeText(text);
+
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1800);
+    } catch {}
+  };
 
   return (
     <div className={`flex ${isUser ? 'justify-end' : 'justify-start'} group`}>
       <div
         className={`
+          relative
           max-w-[78%] px-5 py-4 rounded-3xl leading-relaxed shadow-sm
-          transition-all text-[18px] md:text-[18px] font-mono
+          transition-all text-[18px] font-mono
           ${isUser
             ? 'bg-white/10 text-zinc-200 rounded-tr-none'
             : 'text-zinc-100 rounded-tl-none'
@@ -59,18 +83,37 @@ export default function ChatMessage({ message, shouldType = false }: ChatMessage
         `}
       >
         {isUser ? (
-          // User messages → always plain text
-          <span>{displayedText}</span>
-        ) : isTypingFinished ? (
-          // Bot message, typing done → render as HTML
-          <span dangerouslySetInnerHTML={{ __html: content }} />
+          <span>{message.content}</span>
         ) : (
-          // Bot message while typing → show plain text + cursor
           <>
-            {displayedText || '\u00A0' /* prevent collapse */}
-            <span className="animate-pulse">|</span>
+            <span>{parse(visibleHTML)}</span>
+
+            {!isFinished && (
+              <span className="animate-pulse ml-1">▌</span>
+            )}
           </>
         )}
+
+        {/* ⭐ Copy Button */}
+        <button
+          onClick={handleCopy}
+          className="
+            absolute -bottom-6 right-2
+            opacity-0 group-hover:opacity-100
+            transition-opacity duration-200
+            p-1.5 rounded-md
+            bg-black/40 hover:bg-black/60
+            backdrop-blur
+          "
+          aria-label="Copy message"
+        >
+          {copied ? (
+            <Check className="w-4 h-4 text-green-400" />
+          ) : (
+            <Copy className="w-4 h-4 text-zinc-300" />
+          )}
+        </button>
+
       </div>
     </div>
   );

@@ -52,7 +52,7 @@ export default function ChatContainer() {
       });
 
       const data = await res.json();
-      addMessage('bot', data.answer);
+      addMessage('bot', data.text);
     } catch (error) {
       addMessage('bot', 'Sorry, something went wrong connecting to the server.');
     } finally {
