@@ -1,4 +1,4 @@
-# Adwa ChatBot 🤖🇪🇹
+# Adwa ChatBot
 
 **Adwa ChatBot** is a **RAG-based (Retrieval-Augmented Generation) AI assistant** designed to provide accurate and interactive information about the historic **Battle of Adwa**. It leverages **over 400 pages of textual content** and data from **3+ websites** to ensure well-informed responses, while minimizing hallucinations common in AI chatbots.
 
