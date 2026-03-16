@@ -9,3 +9,4 @@ groq
 pypdf
 requests
 python-multipart
+google-generativeai
