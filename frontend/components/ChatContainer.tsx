@@ -60,6 +60,10 @@ export default function ChatContainer() {
     }
   };
 
+  const userHistory = messages
+  .filter(m => m.role === 'user')
+  .map(m => m.content);
+
   if (!isLoaded) {
     return (
       <div className="fixed inset-0 flex items-center justify-center bg-black/80 backdrop-blur-sm z-50">
@@ -153,7 +157,10 @@ export default function ChatContainer() {
       {/* Input area */}
       <div className="fixed bottom-0 left-0 right-0 z-40">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-10 pb-4 pt-2">
-          <ChatInput onSend={handleSend} />
+          <ChatInput
+  onSend={handleSend}
+  history={userHistory}
+/>
         </div>
       </div>
 

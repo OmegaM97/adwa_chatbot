@@ -4,12 +4,18 @@ import { useState, useRef, useEffect } from 'react';
 
 interface ChatInputProps {
   onSend: (content: string) => void;
+  history?: string[];
 }
 
-const MAX_HEIGHT = 192; // ≈ 8 lines
+const MAX_HEIGHT = 192;
 
-export default function ChatInput({ onSend }: ChatInputProps) {
+export default function ChatInput({
+  onSend,
+  history = []
+}: ChatInputProps) {
   const [value, setValue] = useState('');
+  const [historyIndex, setHistoryIndex] = useState<number | null>(null);
+
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const adjustHeight = () => {
@@ -17,11 +23,9 @@ export default function ChatInput({ onSend }: ChatInputProps) {
     if (!textarea) return;
 
     textarea.style.height = 'auto';
-
     const newHeight = Math.min(textarea.scrollHeight, MAX_HEIGHT);
     textarea.style.height = `${newHeight}px`;
 
-    // enable scroll after max height
     textarea.style.overflowY =
       textarea.scrollHeight > MAX_HEIGHT ? 'auto' : 'hidden';
   };
@@ -30,12 +34,18 @@ export default function ChatInput({ onSend }: ChatInputProps) {
     adjustHeight();
   }, [value]);
 
+  // 🧠 Reset history navigation when history changes
+  useEffect(() => {
+    setHistoryIndex(null);
+  }, [history]);
+
   const handleSubmit = () => {
     if (!value.trim()) return;
+
     onSend(value);
     setValue('');
+    setHistoryIndex(null);
 
-    // reset height after send
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto';
       textareaRef.current.style.overflowY = 'hidden';
@@ -43,19 +53,68 @@ export default function ChatInput({ onSend }: ChatInputProps) {
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+
+    // ✅ Enter to send
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSubmit();
+      return;
+    }
+
+    // 🎮 History navigation (only when cursor at start)
+    if (e.key === 'ArrowUp') {
+
+      const textarea = textareaRef.current;
+      if (!textarea) return;
+
+      // Only trigger if cursor at first line
+      if (textarea.selectionStart !== 0) return;
+      if (history.length === 0) return;
+
+      e.preventDefault();
+
+      const nextIndex =
+        historyIndex === null
+          ? history.length - 1
+          : Math.max(0, historyIndex - 1);
+
+      setHistoryIndex(nextIndex);
+      setValue(history[nextIndex]);
+      return;
+    }
+
+    if (e.key === 'ArrowDown') {
+
+      const textarea = textareaRef.current;
+      if (!textarea) return;
+
+      if (historyIndex === null) return;
+
+      e.preventDefault();
+
+      const nextIndex = historyIndex + 1;
+
+      if (nextIndex >= history.length) {
+        setHistoryIndex(null);
+        setValue('');
+      } else {
+        setHistoryIndex(nextIndex);
+        setValue(history[nextIndex]);
+      }
     }
   };
 
   return (
     <div className="relative mx-auto w-full max-w-3xl">
       <div className="glass-input bg-zinc-900/90 backdrop-blur-2xl border border-white/10 rounded-3xl shadow-2xl p-2 flex items-end gap-3">
+
         <textarea
           ref={textareaRef}
           value={value}
-          onChange={(e) => setValue(e.target.value)}
+          onChange={(e) => {
+            setValue(e.target.value);
+            setHistoryIndex(null); // typing exits history mode
+          }}
           onKeyDown={handleKeyDown}
           placeholder="Message Adwa ChatBot..."
           rows={1}
