@@ -7,7 +7,7 @@ app = FastAPI()
 
 
 origins = [
-    "https://aau-chatbot-liart.vercel.app",
+    "https://adwa-chatbot.vercel.app",
 ]
 
 app.add_middleware(
