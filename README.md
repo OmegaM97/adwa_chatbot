@@ -6,6 +6,7 @@
 
 ## Features
 
+- **dual language support**: You can ask question about adwa in Amharic or English.
 - **Interactive Chatting**: Ask questions about the Battle of Adwa and receive detailed answers.
 - **Typing Effect**: Messages from the bot appear with a natural typewriter animation.
 - **Minimized Hallucination**: Uses a RAG system to retrieve accurate information from your dataset.
@@ -47,7 +48,7 @@ cd backend
 pipenv install
 ```
 
-Note: Inside rag and other folders, some .py files are commented out. Remove comment markers to enable them.
+Note: Inside rag and other folders, some .py files are commented out for the purpose of deployment. Remove comment markers to enable them.
 
 Update any frontend URLs in backend config files to point to your local frontend (http://localhost:3000).
 
