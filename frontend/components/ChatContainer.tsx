@@ -18,12 +18,12 @@ export default function ChatContainer() {
       languageLabel: 'en'
     },
     am: {
-      siteTitle: 'አድዋ ቻቦት',
+      siteTitle: 'አድዋ ቻትቦት',
       newChat: 'አዲስ ውይይት',
       howCanIHelp: 'እንዴት ልረዳዎት?',
       askQuestion: 'ስለ አድዋ ማንኛውንም ጥያቄ ማቅረብ ይችላሉ።',
-      placeholder: 'ከአድዋ ቻቦት ጋር መልዕክት ይላኩ...',
-      infoText: 'አድዋ ቻቦት ስህተት ሊያደርግ ይችላል • አስፈላጊ መረጃ ይፈትኑ',
+      placeholder: 'ከአድዋ ቻትቦት ጋር መልዕክት ይላኩ...',
+      infoText: 'አድዋ ቻትቦት ስህተት ሊያደርግ ይችላል • አስፈላጊ መረጃ ይፈትኑ',
       languageLabel: 'አማ'
     },
   };
@@ -68,7 +68,7 @@ export default function ChatContainer() {
     setLoading(true);
 
     try {
-      const res = await fetch('https://adwachatbot-production.up.railway.app/api/chat', {
+      const res = await fetch('http://127.0.0.1:8000/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ question: content }),

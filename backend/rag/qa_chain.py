@@ -32,6 +32,8 @@ Rules you must follow strictly:
 
 3. Always format the answer using clean, well-structured HTML with inline CSS to make it visually clear and readable.
 
+4. user questions might be in amharic or english, so answer in same language as the question.
+
 Formatting Rules for HTML Output:
 - Wrap the entire answer in a container:
   <div style="font-family: Arial, sans-serif; line-height:1.6;">
