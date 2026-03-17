@@ -3,9 +3,32 @@ import { useRef, useEffect, useState } from 'react';
 import { useLocalStorageChat } from '@/hooks/useLocalStorageChats';
 import ChatMessage from './ChatMessage';
 import ChatInput from './ChatInput';
-import { Bot, Loader2 } from 'lucide-react';
+import { Bot, Loader2, Globe } from 'lucide-react';
 
 export default function ChatContainer() {
+  const [locale, setLocale] = useState<'en' | 'am'>('en');
+  const stringsByLocale = {
+    en: {
+      siteTitle: 'Adwa ChatBot',
+      newChat: 'New chat',
+      howCanIHelp: 'How can I help you?',
+      askQuestion: 'Ask me anything about Adwa and I\'ll do my best to assist you.',
+      placeholder: 'Message Adwa ChatBot...',
+      infoText: 'Adwa ChatBot may make mistakes • Check Important Info',
+      languageLabel: 'en'
+    },
+    am: {
+      siteTitle: 'አድዋ ቻቦት',
+      newChat: 'አዲስ ውይይት',
+      howCanIHelp: 'እንዴት ልረዳዎት?',
+      askQuestion: 'ስለ አድዋ ማንኛውንም ጥያቄ ማቅረብ ይችላሉ።',
+      placeholder: 'ከአድዋ ቻቦት ጋር መልዕክት ይላኩ...',
+      infoText: 'አድዋ ቻቦት ስህተት ሊያደርግ ይችላል • አስፈላጊ መረጃ ይፈትኑ',
+      languageLabel: 'አማ'
+    },
+  };
+  const strings = stringsByLocale[locale];
+
   const { messages, addMessage, clearMessages, isLoaded } = useLocalStorageChat();
   const scrollRef = useRef<HTMLDivElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -93,17 +116,28 @@ export default function ChatContainer() {
           <div className="w-7 h-7 rounded-xl flex items-center justify-center text-xs font-bold">
             <Bot className="w-8 h-8 text-zinc-200" strokeWidth={1.6} />
           </div>
-          <span className="font-semibold tracking-tighter text-lg">Adwa ChatBot</span>
+          <span className="font-semibold tracking-tighter text-lg">{strings.siteTitle}</span>
         </div>
 
-        {hasMessages && (
+        <div className="flex items-center gap-2">
+          {hasMessages && (
+            <button
+              onClick={clearMessages}
+              className="text-xs px-4 py-1.5 rounded-full border border-white/10 hover:bg-white/5 transition-colors"
+            >
+              {strings.newChat}
+            </button>
+          )}
+
           <button
-            onClick={clearMessages}
-            className="text-xs px-4 py-1.5 rounded-full border border-white/10 hover:bg-white/5 transition-colors"
+            onClick={() => setLocale(locale === 'en' ? 'am' : 'en')}
+            className="flex items-center gap-1 text-xs px-3 py-1.5 rounded-full border border-white/10 hover:bg-white/10 transition-colors"
+            aria-label="Toggle language"
           >
-            New chat
+            <Globe className="w-4 h-4" />
+            <span>{locale === 'en' ? 'en' : 'አማ'}</span>
           </button>
-        )}
+        </div>
       </header>
 
       {/* Messages area */}
@@ -145,10 +179,10 @@ export default function ChatContainer() {
               <Bot className="w-8 h-8 text-zinc-200" strokeWidth={1.6} />
             </div>
             <h1 className="text-4xl md:text-5xl font-sans font-bold tracking-tighter mb-4 bg-gradient-to-b from-white to-zinc-400 bg-clip-text text-transparent">
-              How can I help you?
+              {strings.howCanIHelp}
             </h1>
             <p className="text-zinc-400 font-mono text-base md:text-lg">
-              Ask me anything about Adwa and I'll do my best to assist you.
+              {strings.askQuestion}
             </p>
           </div>
         )}
@@ -158,9 +192,11 @@ export default function ChatContainer() {
       <div className="fixed bottom-0 left-0 right-0 z-40">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-10 pb-4 pt-2">
           <ChatInput
-  onSend={handleSend}
-  history={userHistory}
-/>
+            onSend={handleSend}
+            history={userHistory}
+            placeholder={strings.placeholder}
+            infoText={strings.infoText}
+          />
         </div>
       </div>
 

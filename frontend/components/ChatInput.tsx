@@ -5,13 +5,17 @@ import { useState, useRef, useEffect } from 'react';
 interface ChatInputProps {
   onSend: (content: string) => void;
   history?: string[];
+  placeholder?: string;
+  infoText?: string;
 }
 
 const MAX_HEIGHT = 192;
 
 export default function ChatInput({
   onSend,
-  history = []
+  history = [],
+  placeholder = 'Message Adwa ChatBot...',
+  infoText = 'Adwa ChatBot may make mistakes • Check Important Info',
 }: ChatInputProps) {
   const [value, setValue] = useState('');
   const [historyIndex, setHistoryIndex] = useState<number | null>(null);
@@ -107,7 +111,6 @@ export default function ChatInput({
   return (
     <div className="relative mx-auto w-full max-w-3xl">
       <div className="glass-input bg-zinc-900/90 backdrop-blur-2xl border border-white/10 rounded-3xl shadow-2xl p-2 flex items-end gap-3">
-
         <textarea
           ref={textareaRef}
           value={value}
@@ -116,7 +119,7 @@ export default function ChatInput({
             setHistoryIndex(null); // typing exits history mode
           }}
           onKeyDown={handleKeyDown}
-          placeholder="Message Adwa ChatBot..."
+          placeholder={placeholder}
           rows={1}
           className="flex-1 bg-transparent px-5 py-3.5 text-[15.5px] placeholder-zinc-400 focus:outline-none resize-none leading-tight max-h-[192px] overflow-hidden scrollbar-thin"
         />
@@ -144,7 +147,7 @@ export default function ChatInput({
       </div>
 
       <div className="text-center text-[10px] text-zinc-500 mt-3 tracking-widest">
-        Adwa ChatBot may make mistakes • Check Important Info
+        {infoText}
       </div>
     </div>
   );
